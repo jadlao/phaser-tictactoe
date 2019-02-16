@@ -5,6 +5,28 @@ export default class Intro extends Phaser.Scene {
 		});
 	}
 	preload() {
+		this.load.audio('intro_music', ['/assets/audio/01-Opening.ogg'])
+		this.load.image('background', '/assets/sprites/titlescreen/background.png')
+		this.load.image('bgbox', '/assets/sprites/titlescreen/bgbox.png')
+    this.load.image('title', '/assets/sprites/titlescreen/title.png')
+    this.load.image('championships', '/assets/sprites/titlescreen/championshipstitle.png')
+		this.load.image('tictactoe', '/assets/sprites/titlescreen/tictactoetitle.png')
+    this.load.image('startbutton', '/assets/sprites/titlescreen/startbutton.png')
+    
+		this.load.audio('coin_sound', ['/assets/audio/sfx_coin_double1.wav'])
+		this.load.audio('winning_sound', ['/assets/audio/sfx_sounds_powerup4.wav'])
+
+		this.load.image('box_blank', '/assets/sprites/box_blank.png')
+		this.load.image('box_xblue', '/assets/sprites/box_xblue.png')
+		this.load.image('box_ored', '/assets/sprites/box_ored.png')
+		this.load.image('boardbg', '/assets/sprites/board/boardbg.png')
+
+		this.load.image('playagain', '/assets/sprites/board/playagain.png')
+		this.load.image('wins', '/assets/sprites/board/wins.png')
+
+		this.load.image('xIcon', '/assets/sprites/board/x.png')
+		this.load.image('oIcon', '/assets/sprites/board/o.png')
+
 		this.load.script(
 			'webfont',
 			'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js'
@@ -23,46 +45,132 @@ export default class Intro extends Phaser.Scene {
 		});
 	}
 	create() {
-		this.make.text({
-			x: 250,
-			y: 300,
-			text: 'Press Space Bar',
-			style: {
-				fontSize: '20px',
-				fontFamily: 'Arial',
-				color: '#ffffff',
-				align: 'center',
-				backgroundColor: '#000000',
-				shadow: {
-					color: '#000000',
-					fill: true,
-					offsetX: 2,
-					offsetY: 2,
-					blur: 8
-				}
-			}
-		});
-		var add = this.add;
-		var input = this.input;
-		WebFont.load({
-			google: {
-				families: ['Fredericka the Great']
-			},
-			active: function() {
-				add
-					.text(75, 100, `Phaser 3 Starter Kit`, {
-						fontFamily: 'Fredericka the Great',
-						fontSize: 50,
-						color: '#ffffff'
-					})
-					.setShadow(2, 2, '#333333', 2, false, true);
-			}
-		});
-		this.keys = this.input.keyboard.addKeys('SPACE');
-	}
+    /*====================
+    Audio
+    ======================
+    */
+		this.intro_music = this.sound.add('intro_music', {
+      mute: false,
+      volume: 1,
+      loop: true,
+    })
+    this.intro_music.play()
+
+    /*====================
+    Position GameObjects
+    ======================
+    */
+    this.background = this.add.image(0,0, 'background').setOrigin(0,0)
+    this.bgbox = this.add.image(0, 0, 'bgbox').setOrigin(0, 0).setAlpha(0)
+
+    this.title = this.add.image(this.game.config.width / 2, 110, 'title').setAlpha(0)
+    this.championships = this.add.image(this.game.config.width / 2, 200, 'championships').setAlpha(0)
+    this.tictactoe = this.add.image(this.game.config.width / 2, 220, 'tictactoe').setAlpha(0)
+    this.startbutton = this.add.image(this.game.config.width / 2, 270, 'startbutton').setAlpha(0)
+
+    /*====================
+    Animate GameObjects
+    ======================
+    */
+   this.bgboxTween = this.tweens.timeline({
+     targets: this.bgbox,
+     ease: 'Linear',
+     loop: 0,
+     tweens: [
+       {
+         alpha: 0.5,
+         ease: 'Linear',
+         duration: 2000,
+         delay: 1000,
+         repeat: 0
+       }
+     ]
+   })
+   this.titleTween = this.tweens.timeline({
+    targets: this.title,
+    ease: 'Linear',
+    loop: 0,
+    tweens: [
+      {
+        y: 100,
+        alpha: 1,
+        ease: 'Linear',
+        duration: 1000,
+        delay: 0,
+        repeat: 0,
+        yoyo: false
+      },
+      {
+        y: 110,
+        alpha: 1,
+        ease: 'Linear',
+        duration: 600,
+        delay: 0,
+        repeat: -1,
+        yoyo: true
+      },
+    ]
+  })
+  this.ChampionshipTween = this.tweens.timeline({
+    targets: this.championships,
+    ease: 'Linear',
+    loop: 0,
+    tweens: [
+      {
+        y: 170,
+        alpha: 1,
+        ease: 'Linear',
+        duration: 600,
+        delay: 1000,
+        repeat: 0,
+      }
+    ]
+  })
+  this.tictactoeTween = this.tweens.timeline({
+    targets: this.tictactoe,
+    ease: 'Linear',
+    loop: 0,
+    tweens: [
+      {
+        y: 200,
+        alpha: 1,
+        ease: 'Linear',
+        duration: 600,
+        delay: 1300,
+        repeat: 0,
+      }
+    ]
+  })
+  this.startbuttonTween = this.tweens.timeline({
+    targets: this.startbutton,
+    ease: 'Linear',
+    loop: 0,
+    tweens: [
+      {
+        y: 240,
+        alpha: 1,
+        ease: 'Linear',
+        duration: 500,
+        delay: 1600,
+        repeat: 0,
+      }
+    ]
+  })
+  /*====================
+    Actions
+  ======================
+  */
+  this.keys = this.input.keyboard.addKeys('ENTER, SPACE')
+
+  this.startbutton.setInteractive().on('pointerdown', () => {
+    this.intro_music.stop()
+    this.scene.start('Level1')
+  })
+  }
+   
 	update(delta) {
-		if (this.keys.SPACE.isDown) {
-			this.scene.start('Level1');
-		}
+    if(this.keys.SPACE.isDown || this.keys.ENTER.isDown) {
+      this.scene.start('Level1')
+    }
 	}
 }
